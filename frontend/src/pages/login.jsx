@@ -44,7 +44,7 @@ const Login = () => {
             break;
           case "contestant":
           default:
-            navigate("/contestant-profile");
+            navigate("/contestantdashboard");
             break;
         }
       } else {
