@@ -222,6 +222,41 @@ app.post("/submissions", upload.single("mp3AudioUpload"), async (req, res) => {
   }
 });
 
+app.get("/submissions", async (req, res) => {
+  try {
+    const submissions = await Submission.find().populate(
+      "userId",
+      "name email"
+    );
+    console.log("Submissions:", submissions); // Add this line
+    res.json(submissions);
+  } catch (error) {
+    console.error("Error fetching submissions:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.put("/submissions/:id/score", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { score } = req.body;
+
+    const updatedSubmission = await Submission.findByIdAndUpdate(
+      id,
+      { score },
+      { new: true }
+    );
+
+    if (!updatedSubmission) {
+      return res.status(404).json({ message: "Submission not found" });
+    }
+
+    res.json(updatedSubmission);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 // **Start Server**
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
