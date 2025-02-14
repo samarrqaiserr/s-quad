@@ -9,6 +9,53 @@ const Login = () => {
   const [isSignup, setIsSignup] = useState(false); // Toggle between login/signup
   const navigate = useNavigate(); // Hook for navigation
 
+  // const handleAuth = async (e) => {
+  //   e.preventDefault();
+
+  //   const endpoint = isSignup ? "signup" : "login";
+  //   const userData = isSignup
+  //     ? { name, email, password, role }
+  //     : { email, password };
+
+  //   try {
+  //     const res = await fetch(`http://localhost:5000/${endpoint}`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(userData),
+  //     });
+
+  //     if (!res.ok) {
+  //       throw new Error(`HTTP error! Status: ${res.status}`);
+  //     }
+
+  //     const data = await res.json();
+  //     console.log("Server Response:", data); // Debugging Line
+
+  //     if (data.user && data.user.role) {
+  //       localStorage.setItem("token", data.token);
+  //       alert("Login successful!");
+
+  //       switch (data.user.role) {
+  //         case "admin":
+  //           navigate("/admin");
+  //           break;
+  //         case "judge":
+  //           navigate("/judge");
+  //           break;
+  //         case "contestant":
+  //         default:
+  //           navigate("/contestant-profile");
+  //           break;
+  //       }
+  //     } else {
+  //       alert("Invalid response from server!");
+  //     }
+  //   } catch (error) {
+  //     console.error("Fetch error:", error);
+  //     alert("An error occurred. Please try again.");
+  //   }
+  // };
+
   const handleAuth = async (e) => {
     e.preventDefault();
 
@@ -24,18 +71,20 @@ const Login = () => {
         body: JSON.stringify(userData),
       });
 
+      const rawText = await res.text(); // Get raw response text
+      console.log("Raw Response:", rawText); // Log raw response for debugging
+
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
 
-      const data = await res.json();
-      console.log("Server Response:", data); // Debugging Line
+      const data = JSON.parse(rawText); // Convert raw text to JSON
 
-      if (data.user && data.user.role) {
+      if (data.token) {
         localStorage.setItem("token", data.token);
         alert("Login successful!");
 
-        switch (data.user.role) {
+        switch (data.role) {
           case "admin":
             navigate("/admin");
             break;
@@ -44,7 +93,7 @@ const Login = () => {
             break;
           case "contestant":
           default:
-            navigate("/contestantdashboard");
+            navigate("/contestant-profile");
             break;
         }
       } else {
