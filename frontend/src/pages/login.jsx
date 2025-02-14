@@ -12,31 +12,47 @@ const Login = () => {
   const handleAuth = async (e) => {
     e.preventDefault();
 
-    const endpoint = isSignup ? "signup" : "login"; // Select the correct endpoint
+    const endpoint = isSignup ? "signup" : "login";
     const userData = isSignup
       ? { name, email, password, role }
       : { email, password };
 
-    const res = await fetch(`http://localhost:5000/${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
-    });
+    try {
+      const res = await fetch(`http://localhost:5000/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      if (isSignup) {
-        alert("Signup successful! Please log in.");
-        setIsSignup(false); // Switch to login mode after signup
-      } else {
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Server Response:", data); // Debugging Line
+
+      if (data.user && data.user.role) {
         localStorage.setItem("token", data.token);
         alert("Login successful!");
 
-        // ✅ Redirect to Contestant Profile Page
-        navigate("/contestant-profile");
+        switch (data.user.role) {
+          case "admin":
+            navigate("/admin");
+            break;
+          case "judge":
+            navigate("/judge");
+            break;
+          case "contestant":
+          default:
+            navigate("/contestant-profile");
+            break;
+        }
+      } else {
+        alert("Invalid response from server!");
       }
-    } else {
-      alert(data.error);
+    } catch (error) {
+      console.error("Fetch error:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 

@@ -1,5 +1,7 @@
 import React from "react";
 
-export default function contestantprofile() {
-  return <div>contestantprofile</div>;
-}
+const ContestantProfile = () => {
+  return <div>Contestant Profile Page</div>;
+};
+
+export default ContestantProfile;
